@@ -1,11 +1,16 @@
+const config = require("config");
 const express = require("express");
 const app = express();
-const studentRouter = require("./routes/student.route");
-
 app.use(express.json());
-app.use("/api/v1/students", studentRouter);
+require("./routes/")(app);
 
-const port = process.env.PORT || 3001;
+// APP SERVER ROUTE
+const port = config.get("app_port") || 3001;
+
+app.get("/", (req, res) => {
+  res.send("Hello welcome to my first api with Node/Express/Sequelize");
+});
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });

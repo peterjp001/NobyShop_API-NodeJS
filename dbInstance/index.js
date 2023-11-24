@@ -1,9 +1,10 @@
-const Sequelize = require("sequelize");
-const dbInstance = new Sequelize("sequelize_db", "root", "", {
-  host: "localhost",
-  dialect: "mysql" /* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
-});
+const { createDatabase, dbInstance } = require("./databaseAndInstance");
+const models = require("../models");
 
+// CREATE DATABASE
+createDatabase();
+
+// TEST DATABASE CONNECTION
 (async () => {
   try {
     await dbInstance.authenticate();
@@ -13,12 +14,16 @@ const dbInstance = new Sequelize("sequelize_db", "root", "", {
   }
 })();
 
+const modelInstance = models(dbInstance);
+
+// SYNC MODELS
 (async () => {
   try {
     await dbInstance.sync();
+    //CREATE DATABASE
   } catch (error) {
     console.log(error);
   }
 })();
 
-module.exports = dbInstance;
+module.exports = modelInstance;
