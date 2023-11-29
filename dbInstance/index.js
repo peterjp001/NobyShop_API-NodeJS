@@ -4,16 +4,7 @@ const models = require("../models");
 // CREATE DATABASE
 createDatabase();
 
-// TEST DATABASE CONNECTION
-(async () => {
-  try {
-    await dbInstance.authenticate();
-    console.log("Connection has been established successfully.");
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
-})();
-
+// MODELS
 const modelInstance = models(dbInstance);
 
 // SYNC MODELS

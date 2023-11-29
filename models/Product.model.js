@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const constant = require("../utils/constant")
+const constant = require("../utils/constant");
 const Product = async (instance) => {
   const Product = instance.define(
     "product",
@@ -14,9 +14,19 @@ const Product = async (instance) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [3, 100],
           notNull: {
-            msg: constant.MSG_REQUIRE_NAME
+            msg: constant.MSG_REQUIRE_FIELD("Name")
+          },
+          min: { args: 3, msg: constant.MSG_LENGTH({ min: 3 }) },
+          max: { args: 100, msg: constant.MSG_LENGTH({ max: 10 }) }
+        }
+      },
+      price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: constant.MSG_REQUIRE_FIELD("Price")
           }
         }
       },

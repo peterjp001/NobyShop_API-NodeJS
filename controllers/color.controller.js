@@ -1,47 +1,54 @@
+const AppError = require("../utils/CustomError");
 const colorService = require("../services/color.service");
+const constant = require("../utils/constant");
+const { errorstringify } = require("../utils/errorHandler");
 
-const createColor = (req, res) => {
-  const { name, code } = req.body;
-  colorService.createColor({ name, code }).then((data) => {
-    res.send(data.toJSON());
-  });
+// refractor getting color by id
+const getColorByID = async (id) => {
+  const color = await colorService.findColorById(id);
+  if (!color) throw new AppError(errorstringify(constant.MSG_ID_NOT_FOUND("Color", id), 404));
+  return color;
 };
 
+// CREATE COLOR
+const createColor = async (req, res) => {
+  const { name, code, description } = req.body;
+  const data = await colorService.createColor({ name, code, description });
+  res.send(data.toJSON());
+};
+
+// FIND ALL COLORS
 const findAllColor = async (req, res) => {
   const all = await colorService.findAllColor();
   return res.send(all);
 };
+
+// FIND COLOR BY ID
 const findColorById = async (req, res) => {
   const id = req.params.id;
-  const color = await colorService.findColorById(id);
-  if (!color) return res.status(400).send(`Color with the id given "${id}" not found`);
+  const color = await getColorByID(id);
   return res.send(color);
 };
+
+// DELETE COLOR BY ID
 const deleteColorById = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const color = await colorService.findColorById(id);
-    if (!color) return res.status(400).send(`Color with the id given "${id}" not found`);
-    await colorService.deleteColorById(color);
-    return res.send("Color deleted");
-  } catch (error) {
-    console.log(error);
-  }
+  const id = req.params.id;
+  const color = await getColorByID(id);
+  await colorService.deleteColorById(color);
+
+  return res.json({ msg: "Color deleted", isDeleted: true });
 };
 
+// UPDATE COLOR
 const updateColor = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const color = await colorService.findColorById(id);
-    if (!color) return res.status(400).send(`Color with the id given "${id}" not found`);
+  const id = req.params.id;
+  const { name, code, description } = req.body;
 
-    await colorService.updateColor({ name: req.body.name, code: req.body.code }, id);
+  await getColorByID(id);
+  await colorService.updateColor({ name, code, description }, id);
 
-    const modifiedColor = await colorService.findColorById(id);
-    res.send(modifiedColor);
-  } catch (error) {
-    console.log(error);
-  }
+  const modifiedColor = await colorService.findColorById(id);
+  return res.send(modifiedColor);
 };
 
 module.exports = { createColor, findAllColor, findColorById, updateColor, deleteColorById };

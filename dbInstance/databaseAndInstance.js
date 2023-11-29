@@ -1,20 +1,34 @@
 const config = require("config");
 const Sequelize = require("sequelize");
+const logger = require("../utils/logger");
 
 // CREATE DATABASE
-module.exports.createDatabase = async () => {
+const createDatabase = async () => {
   try {
     const databaseServerConnection = new Sequelize(`mysql://${config.get("db.username")}:${""}@${config.get("db.host")}:${config.get("db.port")}`);
     await databaseServerConnection.query(`CREATE DATABASE IF NOT EXISTS ${config.get("db.name")}`);
-    console.log("Database created successfully.");
+    logger.info("Database created successfully.");
   } catch (error) {
-    console.log(`Error while creating database "${config.get("db.name")}"`, error);
+    logger.error(`Error while creating database "${config.get("db.name")}"`, error);
   }
 };
 
 // CREATE SEQUELIZE INSTANCE FOR DATABASE CONNECTION
-module.exports.dbInstance = new Sequelize(config.get("db.name"), config.get("db.username"), "", {
+const dbInstance = new Sequelize(config.get("db.name"), config.get("db.username"), "", {
   host: config.get("db.host"),
   port: config.get("db.port"),
-  dialect: "mysql" /* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */
+  dialect: "mysql" /* one of 'mysql' | 'postgres' | 'sqlite' | 'mariadb' | 'mssql' | 'db2' | 'snowflake' | 'oracle' */,
+  logging: (msg) => logger.info(msg)
 });
+
+// TEST DATABASE CONNECTION
+dbInstance
+  .authenticate()
+  .then(() => {
+    logger.info("Connection has been established successfully.");
+  })
+  .catch((err) => {
+    logger.error("Unable to connect to the database:", err);
+  });
+
+module.exports = { dbInstance, createDatabase };

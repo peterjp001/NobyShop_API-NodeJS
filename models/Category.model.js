@@ -17,7 +17,7 @@ const Category = (instance) => {
         validate: {
           len: [3, 100],
           notNull: {
-            msg: constant.MSG_REQUIRE_NAME
+            msg: constant.MSG_REQUIRE_FIELD("Name")
           }
         }
       },

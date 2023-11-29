@@ -14,19 +14,22 @@ const Size = (instance) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         validate: {
-          len: [3, 100],
+          len: { args: [3], msg: constant.MSG_LENGTH("Name", { min: 3 }) },
           notNull: {
-            msg: constant.MSG_REQUIRE_NAME
+            msg: constant.MSG_REQUIRE_FIELD("Name")
           }
         }
       },
       code: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         validate: {
+          len: { args: [3], msg: constant.MSG_LENGTH("Code", { min: 3 }) },
           notNull: {
-            msg: constant.MSG_REQUIRE_CODE
+            msg: constant.MSG_REQUIRE_FIELD("Code")
           }
         }
       },
@@ -38,8 +41,8 @@ const Size = (instance) => {
     { freezeTableName: true }
   );
 
-  return Size;
   // await Size.sync({ alter: true });
+  return Size;
 };
 
 module.exports = Size;
